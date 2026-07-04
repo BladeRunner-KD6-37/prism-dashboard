@@ -24,7 +24,7 @@ function FilterSidebar({ categories, selected, onToggle, onClear }) {
         <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">
           Category
         </h3>
-        <div className="flex flex-col gap-2.5 max-h-96 overflow-y-auto pr-1">
+        <div className="flex flex-row flex-wrap gap-2.5 sm:flex-col sm:max-h-96 sm:overflow-y-auto pr-1">
           {visibleCategories.map((cat) => {
             const isChecked = selected.includes(cat)
             return (

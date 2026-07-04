@@ -1,38 +1,45 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { fetchProductById } from '../api/products'
-import ImageCarousel from '../components/products/ImageCarousel'
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { fetchProductById } from '../api/products';
+import ImageCarousel from '../components/products/ImageCarousel';
+import { useAuth } from '../context/AuthContext';
+import { usePublishedProducts } from '../hooks/usePublishedProducts';
 
 function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null);
+  const { isAdmin } = useAuth();
+  const { isHidden } = usePublishedProducts();
 
   useEffect(() => {
-    let cancelled = false
-
+    // If the product is hidden and the user is not an admin, redirect immediately
+    if (!isAdmin && isHidden(id)) {
+      navigate('/products', { replace: true });
+      return;
+    }
+    let cancelled = false;
     async function load() {
       try {
-        setLoading(true)
-        const data = await fetchProductById(id)
+        setLoading(true);
+        const data = await fetchProductById(id);
         if (!cancelled) {
-          setProduct(data)
-          setError(null)
+          setProduct(data);
+          setError(null);
         }
       } catch (err) {
-        if (!cancelled) setError(err.message)
+        if (!cancelled) setError(err.message);
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) setLoading(false);
       }
     }
-
-    load()
+    load();
     return () => {
-      cancelled = true
-    }
-  }, [id])
+      cancelled = true;
+    };
+  }, [id, isAdmin, isHidden, navigate]);
 
   if (loading) {
     return <div className="text-center py-12 text-gray-500">Loading product...</div>
@@ -52,6 +59,19 @@ function ProductDetail() {
     )
   }
 
+  if (!isAdmin && isHidden(product.id)) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-500 mb-4">This product is hidden.</p>
+        <button
+          onClick={() => navigate('/products')}
+          className="text-blue-600 text-sm hover:underline"
+        >
+          ← Back to products
+        </button>
+      </div>
+    );
+  }
   return (
     <div>
       <button

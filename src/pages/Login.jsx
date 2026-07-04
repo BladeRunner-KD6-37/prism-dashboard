@@ -1,22 +1,21 @@
-import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const { login, isAuthenticated } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const from = location.state?.from?.pathname || '/products';
 
-  const from = location.state?.from?.pathname || '/products'
-
-  // If already logged in, skip the login page
   if (isAuthenticated) {
-    navigate(from, { replace: true })
-    return null
+    return <Navigate to={from} replace />;
   }
+
 
   const handleSubmit = (e) => {
     e.preventDefault()

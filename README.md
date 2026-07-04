@@ -1,16 +1,42 @@
-# React + Vite
+# Prism Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
+A modern React dashboard built with Vite showcasing product listings, detailed product views, role‑based visibility, column configuration, and live polling. The UI follows a premium design aesthetic with smooth animations, dark‑mode‑compatible colors, and Google‑font typography.
 
-Currently, two official plugins are available:
+## Features
+- **Authentication** – Simple mock auth with two demo users (admin & user).
+- **Role‑Based Product Visibility** – Admins see all products; regular users cannot view products flagged as hidden.
+- **Product List** – Grid and table view, searchable, sortable, paginated, and filterable by category.
+- **Product Detail** – Image carousel, rich product metadata, and hidden‑product guard.
+- **Column Settings** – Persisted column visibility and order for the table view.
+- **Live Polling** – Background refresh of product data every few seconds.
+- **Responsive Design** – Works on desktop and mobile with a glass‑morphism feel.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Demo Credentials
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | `admin` | `admin123` |
+| User  | `user`  | `user123` |
 
-## React Compiler
+## Setup
+```bash
+# Clone the repository (if not already)
+git clone <repo-url>
+cd prism-dashboard
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Install dependencies
+npm install
 
-## Expanding the ESLint configuration
+# Start the development server
+npm run dev
+```
+The app will be available at `http://localhost:5173/`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Build for Production
+```bash
+npm run build
+# Then serve the `dist` folder with any static server
+```
+
+## License
+MIT
