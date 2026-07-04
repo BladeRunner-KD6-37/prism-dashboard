@@ -9,10 +9,10 @@ import { useSearchParams } from "react-router-dom";
 import { useProducts } from "../hooks/useProducts";
 import { useDebounce } from "../hooks/useDebounce";
 import SearchBar from "../components/products/SearchBar";
-import CategoryFilter from "../components/products/CategoryFilter";
 import SortDropdown from "../components/products/SortDropdown";
 import ProductCard from "../components/products/ProductCard";
 import { useProductPolling } from "../hooks/useProductPolling";
+import FilterSidebar from "../components/products/FilterSidebar";
 
 const PAGE_SIZE = 12;
 
@@ -61,6 +61,10 @@ function Products() {
     },
     [setSearchParams],
   );
+
+  const handleClearCategories = useCallback(() => {
+    updateParams({ category: [], page: "1" });
+  }, [updateParams]);
 
   const handleSearchChange = useCallback(
     (value) => {
@@ -158,94 +162,97 @@ function Products() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Products</h1>
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-        <SearchBar value={search} onChange={handleSearchChange} />
-        <SortDropdown value={sort} onChange={handleSortChange} />
-      </div>
 
-      <div className="flex items-center gap-2 ml-auto">
-        <div className="flex border border-gray-300 rounded-md overflow-hidden">
-          <button
-            onClick={() => setViewMode("grid")}
-            className={`px-3 py-2 text-sm ${viewMode === "grid" ? "bg-blue-600 text-white" : "bg-white text-gray-600"}`}
-          >
-            Grid
-          </button>
-          <button
-            onClick={() => setViewMode("table")}
-            className={`px-3 py-2 text-sm ${viewMode === "table" ? "bg-blue-600 text-white" : "bg-white text-gray-600"}`}
-          >
-            Table
-          </button>
-        </div>
-        {viewMode === "table" && (
-          <ColumnSettings
-            columns={columns}
-            onToggle={toggleVisibility}
-            onReorder={reorderColumn}
-            onReset={resetColumns}
-          />
-        )}
-      </div>
-
-      <div className="mb-6">
-        <CategoryFilter
+      <div className="flex flex-col lg:flex-row gap-6">
+        <FilterSidebar
           categories={categories}
           selected={selectedCategories}
           onToggle={handleCategoryToggle}
+          onClear={handleClearCategories}
         />
-      </div>
 
-      <p className="text-sm text-gray-500 mb-4">
-        {filteredProducts.length} product
-        {filteredProducts.length !== 1 ? "s" : ""} found
-      </p>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <SearchBar value={search} onChange={handleSearchChange} />
+            <SortDropdown value={sort} onChange={handleSortChange} />
 
-      {paginatedProducts.length === 0 ? (
-        <p className="text-gray-500 text-center py-12">
-          No products match your filters.
-        </p>
-      ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {paginatedProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
+            <div className="flex items-center gap-2 ml-auto">
+              <div className="flex border border-gray-300 rounded-md overflow-hidden">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`px-3 py-2 text-sm ${viewMode === "grid" ? "bg-blue-600 text-white" : "bg-white text-gray-600"}`}
+                >
+                  Grid
+                </button>
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`px-3 py-2 text-sm ${viewMode === "table" ? "bg-blue-600 text-white" : "bg-white text-gray-600"}`}
+                >
+                  Table
+                </button>
+              </div>
+              {viewMode === "table" && (
+                <ColumnSettings
+                  columns={columns}
+                  onToggle={toggleVisibility}
+                  onReorder={reorderColumn}
+                  onReset={resetColumns}
+                />
+              )}
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-500 mb-4">
+            {filteredProducts.length} product
+            {filteredProducts.length !== 1 ? "s" : ""} found
+          </p>
+
+          {paginatedProducts.length === 0 ? (
+            <p className="text-gray-500 text-center py-12">
+              No products match your filters.
+            </p>
+          ) : viewMode === "grid" ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+              {paginatedProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isAdmin={isAdmin}
+                  isHidden={isHidden(product.id)}
+                  onToggleHidden={() => toggleHidden(product.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <ProductTable
+              products={paginatedProducts}
+              columns={columns}
               isAdmin={isAdmin}
-              isHidden={isHidden(product.id)}
-              onToggleHidden={() => toggleHidden(product.id)}
+              isHidden={isHidden}
+              onToggleHidden={toggleHidden}
             />
-          ))}
-        </div>
-      ) : (
-        <ProductTable
-          products={paginatedProducts}
-          columns={columns}
-          isAdmin={isAdmin}
-          isHidden={isHidden}
-          onToggleHidden={toggleHidden}
-        />
-      )}
+          )}
 
-      {/* Pagination controls */}
-      <div className="flex items-center justify-center gap-2 mt-8">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
-        >
-          Prev
-        </button>
-        <span className="text-sm text-gray-600">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
-        >
-          Next
-        </button>
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Prev
+            </button>
+            <span className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
