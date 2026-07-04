@@ -1,8 +1,178 @@
+import { useMemo, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useProducts } from '../hooks/useProducts'
+import { useDebounce } from '../hooks/useDebounce'
+import SearchBar from '../components/products/SearchBar'
+import CategoryFilter from '../components/products/CategoryFilter'
+import SortDropdown from '../components/products/SortDropdown'
+import ProductCard from '../components/products/ProductCard'
+
+const PAGE_SIZE = 12
+
 function Products() {
+  const { products, loading, error } = useProducts()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Read state directly from the URL
+  const search = searchParams.get('search') || ''
+  const sort = searchParams.get('sort') || ''
+  const page = parseInt(searchParams.get('page') || '1', 10)
+  const selectedCategories = useMemo(
+    () => (searchParams.get('category') ? searchParams.get('category').split(',') : []),
+    [searchParams]
+  )
+
+  const debouncedSearch = useDebounce(search, 400)
+
+  // Helper to update URL params without wiping out other params
+  const updateParams = useCallback(
+    (updates) => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev)
+        Object.entries(updates).forEach(([key, value]) => {
+          if (value === '' || value == null || (Array.isArray(value) && value.length === 0)) {
+            next.delete(key)
+          } else {
+            next.set(key, Array.isArray(value) ? value.join(',') : value)
+          }
+        })
+        return next
+      })
+    },
+    [setSearchParams]
+  )
+
+  const handleSearchChange = useCallback(
+    (value) => {
+      updateParams({ search: value, page: '1' })
+    },
+    [updateParams]
+  )
+
+  const handleCategoryToggle = useCallback(
+    (cat) => {
+      const next = selectedCategories.includes(cat)
+        ? selectedCategories.filter((c) => c !== cat)
+        : [...selectedCategories, cat]
+      updateParams({ category: next, page: '1' })
+    },
+    [selectedCategories, updateParams]
+  )
+
+  const handleSortChange = useCallback(
+    (value) => {
+      updateParams({ sort: value, page: '1' })
+    },
+    [updateParams]
+  )
+
+  const handlePageChange = useCallback(
+    (newPage) => {
+      updateParams({ page: String(newPage) })
+    },
+    [updateParams]
+  )
+
+  // Derive all available categories from the fetched data
+  const categories = useMemo(() => {
+    const set = new Set(products.map((p) => p.category))
+    return Array.from(set).sort()
+  }, [products])
+
+  // Filter -> Search -> Sort pipeline (memoized so it only recalculates when inputs change)
+  const filteredProducts = useMemo(() => {
+    let result = products
+
+    if (selectedCategories.length > 0) {
+      result = result.filter((p) => selectedCategories.includes(p.category))
+    }
+
+    if (debouncedSearch.trim()) {
+      const query = debouncedSearch.trim().toLowerCase()
+      result = result.filter((p) => p.title.toLowerCase().includes(query))
+    }
+
+    if (sort) {
+      const [field, direction] = sort.split('-')
+      result = [...result].sort((a, b) => {
+        let valA = field === 'name' ? a.title.toLowerCase() : a[field]
+        let valB = field === 'name' ? b.title.toLowerCase() : b[field]
+        if (valA < valB) return direction === 'asc' ? -1 : 1
+        if (valA > valB) return direction === 'asc' ? 1 : -1
+        return 0
+      })
+    }
+
+    return result
+  }, [products, selectedCategories, debouncedSearch, sort])
+
+  // Pagination slice
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE
+    return filteredProducts.slice(start, start + PAGE_SIZE)
+  }, [filteredProducts, currentPage])
+
+  if (loading) {
+    return <div className="text-center py-12 text-gray-500">Loading products...</div>
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Error: {error}</div>
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Products</h1>
-      <p className="text-gray-500">Product listing module goes here.</p>
+
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+        <SearchBar value={search} onChange={handleSearchChange} />
+        <SortDropdown value={sort} onChange={handleSortChange} />
+      </div>
+
+      <div className="mb-6">
+        <CategoryFilter
+          categories={categories}
+          selected={selectedCategories}
+          onToggle={handleCategoryToggle}
+        />
+      </div>
+
+      <p className="text-sm text-gray-500 mb-4">
+        {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+      </p>
+
+      {paginatedProducts.length === 0 ? (
+        <p className="text-gray-500 text-center py-12">No products match your filters.</p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {paginatedProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
+
+      {/* Pagination controls */}
+      <div className="flex items-center justify-center gap-2 mt-8">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
+        >
+          Prev
+        </button>
+        <span className="text-sm text-gray-600">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
   )
 }
