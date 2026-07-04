@@ -1,22 +1,20 @@
 import { NavLink } from 'react-router-dom'
-
-const navItems = [
-  { to: '/products', label: 'Products' },
-  { to: '/analytics', label: 'Analytics' },
-]
+import { useAuth } from '../../context/AuthContext'
 
 function Sidebar({ mobileOpen, onClose }) {
+  const { isAdmin } = useAuth()
+
+  const navItems = [
+    { to: '/products', label: 'Products' },
+    ...(isAdmin ? [{ to: '/analytics', label: 'Analytics' }] : []),
+  ]
+
   return (
     <>
-      {/* Mobile overlay */}
       {mobileOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={onClose} />
       )}
 
-      {/* Sidebar itself */}
       <aside
         className={`
           fixed md:static top-0 left-0 h-full w-64 md:w-56 shrink-0
@@ -45,9 +43,7 @@ function Sidebar({ mobileOpen, onClose }) {
               onClick={onClose}
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-100'
+                  isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'
                 }`
               }
             >
