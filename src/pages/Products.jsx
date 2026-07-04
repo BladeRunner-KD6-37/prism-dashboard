@@ -1,3 +1,7 @@
+import { useState } from "react";
+import ProductTable from "../components/products/ProductTable";
+import ColumnSettings from "../components/products/ColumnSettings";
+import { useColumnConfig } from "../hooks/useColumnConfig";
 import { useAuth } from "../context/AuthContext";
 import { usePublishedProducts } from "../hooks/usePublishedProducts";
 import { useMemo, useCallback } from "react";
@@ -8,16 +12,19 @@ import SearchBar from "../components/products/SearchBar";
 import CategoryFilter from "../components/products/CategoryFilter";
 import SortDropdown from "../components/products/SortDropdown";
 import ProductCard from "../components/products/ProductCard";
-import { useProductPolling } from '../hooks/useProductPolling'
+import { useProductPolling } from "../hooks/useProductPolling";
 
 const PAGE_SIZE = 12;
 
 function Products() {
-  const { products,setProducts, loading, error } = useProducts();
-  useProductPolling(products, setProducts, 8000) 
+  const { products, setProducts, loading, error } = useProducts();
+  useProductPolling(products, setProducts, 8000);
   const [searchParams, setSearchParams] = useSearchParams();
   const { isAdmin } = useAuth();
   const { isHidden, toggleHidden } = usePublishedProducts();
+  const [viewMode, setViewMode] = useState("grid"); // 'grid' | 'table'
+  const { columns, toggleVisibility, reorderColumn, resetColumns } =
+    useColumnConfig();
 
   // Read state directly from the URL
   const search = searchParams.get("search") || "";
@@ -156,6 +163,31 @@ function Products() {
         <SortDropdown value={sort} onChange={handleSortChange} />
       </div>
 
+      <div className="flex items-center gap-2 ml-auto">
+        <div className="flex border border-gray-300 rounded-md overflow-hidden">
+          <button
+            onClick={() => setViewMode("grid")}
+            className={`px-3 py-2 text-sm ${viewMode === "grid" ? "bg-blue-600 text-white" : "bg-white text-gray-600"}`}
+          >
+            Grid
+          </button>
+          <button
+            onClick={() => setViewMode("table")}
+            className={`px-3 py-2 text-sm ${viewMode === "table" ? "bg-blue-600 text-white" : "bg-white text-gray-600"}`}
+          >
+            Table
+          </button>
+        </div>
+        {viewMode === "table" && (
+          <ColumnSettings
+            columns={columns}
+            onToggle={toggleVisibility}
+            onReorder={reorderColumn}
+            onReset={resetColumns}
+          />
+        )}
+      </div>
+
       <div className="mb-6">
         <CategoryFilter
           categories={categories}
@@ -173,7 +205,7 @@ function Products() {
         <p className="text-gray-500 text-center py-12">
           No products match your filters.
         </p>
-      ) : (
+      ) : viewMode === "grid" ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {paginatedProducts.map((product) => (
             <ProductCard
@@ -185,6 +217,14 @@ function Products() {
             />
           ))}
         </div>
+      ) : (
+        <ProductTable
+          products={paginatedProducts}
+          columns={columns}
+          isAdmin={isAdmin}
+          isHidden={isHidden}
+          onToggleHidden={toggleHidden}
+        />
       )}
 
       {/* Pagination controls */}
