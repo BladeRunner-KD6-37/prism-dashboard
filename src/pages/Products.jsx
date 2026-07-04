@@ -8,11 +8,13 @@ import SearchBar from "../components/products/SearchBar";
 import CategoryFilter from "../components/products/CategoryFilter";
 import SortDropdown from "../components/products/SortDropdown";
 import ProductCard from "../components/products/ProductCard";
+import { useProductPolling } from '../hooks/useProductPolling'
 
 const PAGE_SIZE = 12;
 
 function Products() {
-  const { products, loading, error } = useProducts();
+  const { products,setProducts, loading, error } = useProducts();
+  useProductPolling(products, setProducts, 8000) 
   const [searchParams, setSearchParams] = useSearchParams();
   const { isAdmin } = useAuth();
   const { isHidden, toggleHidden } = usePublishedProducts();
@@ -149,7 +151,6 @@ function Products() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Products</h1>
-
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
         <SearchBar value={search} onChange={handleSearchChange} />
         <SortDropdown value={sort} onChange={handleSortChange} />

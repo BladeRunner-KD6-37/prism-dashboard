@@ -1,14 +1,23 @@
-import { memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 function ProductCard({ product, isAdmin, isHidden, onToggleHidden }) {
   const navigate = useNavigate()
+  const [justUpdated, setJustUpdated] = useState(false)
+
+  useEffect(() => {
+    if (product._justUpdated) {
+      setJustUpdated(true)
+      const timer = setTimeout(() => setJustUpdated(false), 1200)
+      return () => clearTimeout(timer)
+    }
+  }, [product._justUpdated, product.stock, product.price])
 
   return (
     <div
-      className={`bg-white border rounded-lg p-3 flex flex-col relative ${
+      className={`bg-white border rounded-lg p-3 flex flex-col relative transition-all duration-500 ${
         isHidden ? 'border-red-200 opacity-60' : 'border-gray-200'
-      } hover:shadow-md transition-shadow`}
+      } ${justUpdated ? 'ring-2 ring-blue-400 bg-blue-50' : ''} hover:shadow-md`}
     >
       {isAdmin && (
         <button
