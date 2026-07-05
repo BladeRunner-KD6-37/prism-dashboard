@@ -81,7 +81,8 @@ function ProductsHome() {
             {filteredProducts.map((product) => (
               <article
                 key={product.id}
-                className="bg-white mb-5 border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                onClick={() => navigate(`/products/${product.id}`)}
+                className="bg-white mb-5 border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               >
                 <img src={product.image} alt={product.title} className="w-full h-56 object-cover" loading="lazy" />
 

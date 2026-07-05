@@ -28,7 +28,15 @@ function ChevronRight(props) {
  */
 function DealCarousel({ title, products, onSeeAll, onProductClick, orientation = 'horizontal' }) {
   const trackRef = useRef(null);
-  const dragState = useRef({ pointerId: null, startPos: 0, startScroll: 0 });
+  const pointerState = useRef({
+    isDown: false,
+    startX: 0,
+    startY: 0,
+    startScrollLeft: 0,
+    startScrollTop: 0,
+    pointerId: null,
+    hasDragged: false
+  });
   const [dragging, setDragging] = useState(false);
 
   const scrollByAmount = (amount) => {
@@ -42,35 +50,61 @@ function DealCarousel({ title, products, onSeeAll, onProductClick, orientation =
 
   const handlePointerDown = (e) => {
     if (!trackRef.current) return;
-    dragState.current = {
+    pointerState.current = {
+      isDown: true,
+      startX: e.clientX,
+      startY: e.clientY,
+      startScrollLeft: trackRef.current.scrollLeft,
+      startScrollTop: trackRef.current.scrollTop,
       pointerId: e.pointerId,
-      startPos: orientation === 'vertical' ? e.clientY : e.clientX,
-      startScroll: orientation === 'vertical' ? trackRef.current.scrollTop : trackRef.current.scrollLeft,
+      hasDragged: false
     };
-    setDragging(true);
-    trackRef.current.setPointerCapture(e.pointerId);
   };
 
   const handlePointerMove = (e) => {
-    if (!dragging || !trackRef.current) return;
-    const delta = orientation === 'vertical' ? e.clientY - dragState.current.startPos : e.clientX - dragState.current.startPos;
-    if (orientation === 'vertical') {
-      trackRef.current.scrollTop = dragState.current.startScroll - delta;
-    } else {
-      trackRef.current.scrollLeft = dragState.current.startScroll - delta;
+    const state = pointerState.current;
+    if (!state.isDown || !trackRef.current) return;
+
+    const deltaX = e.clientX - state.startX;
+    const deltaY = e.clientY - state.startY;
+
+    if (!state.hasDragged) {
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      if (distance > 5) {
+        state.hasDragged = true;
+        setDragging(true);
+        try {
+          trackRef.current.setPointerCapture(state.pointerId);
+        } catch {}
+      }
+    }
+
+    if (state.hasDragged) {
+      if (orientation === 'vertical') {
+        trackRef.current.scrollTop = state.startScrollTop - deltaY;
+      } else {
+        trackRef.current.scrollLeft = state.startScrollLeft - deltaX;
+      }
     }
   };
 
   const endDrag = (e) => {
-    if (!trackRef.current) return;
-    if (dragState.current.pointerId !== null) {
+    const state = pointerState.current;
+    if (!state.isDown) return;
+
+    if (state.hasDragged && trackRef.current && state.pointerId !== null) {
       try {
-        trackRef.current.releasePointerCapture(dragState.current.pointerId);
+        trackRef.current.releasePointerCapture(state.pointerId);
       } catch {}
     }
-    dragState.current.pointerId = null;
-    setDragging(false);
-    if (e) e.preventDefault();
+
+    state.isDown = false;
+    state.pointerId = null;
+
+    if (state.hasDragged) {
+      setDragging(false);
+      if (e) e.preventDefault();
+    }
   };
 
   const trackClass = orientation === 'vertical'
@@ -127,7 +161,7 @@ function DealCarousel({ title, products, onSeeAll, onProductClick, orientation =
         <button
           type="button"
           onClick={onSeeAll}
-          className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+          className="text-sm font-medium text-black hover:text-[#f2882c] hover:underline"
         >
           See All
         </button>
@@ -148,9 +182,9 @@ function DealCarousel({ title, products, onSeeAll, onProductClick, orientation =
             <article
               key={product.id}
               onClick={() => onProductClick(product.id)}
-              className="border border-gray-200 rounded-md bg-white p-2 cursor-pointer hover:border-blue-300 hover:shadow-sm"
+              className="bg-white/10 backdrop-blur-xl border border-white/20  shadow-xl p-6"
             >
-              <div className="aspect-square w-full rounded bg-white border border-gray-200 overflow-hidden mb-2">
+              <div className="aspect-square w-full rounded bg-white overflow-hidden mb-2">
                 <img src={product.thumbnail} alt={product.title} loading="lazy" className="w-full h-full object-cover" />
               </div>
               <h4 className="text-xs font-medium text-gray-900 line-clamp-2 min-h-8">{product.title}</h4>

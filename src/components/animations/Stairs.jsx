@@ -11,6 +11,8 @@ const Stairs = (props) => {
 
   useGSAP(
     function () {
+      if (currentPath === '/') return
+
       const tl = gsap.timeline()
       tl.to(stairParentRef.current, {
         display: 'block',
@@ -34,11 +36,11 @@ const Stairs = (props) => {
         y: '0%',
       })
 
-      gsap.from(pageRef.current, {
-        opacity: 0,
-        delay: 1,
-        scale: 1.2,
-      })
+      gsap.fromTo(
+        pageRef.current,
+        { opacity: 0, scale: 1.2 },
+        { opacity: 1, scale: 1, delay: 1, duration: 0.4, ease: 'power2.out' }
+      )
     },
     [currentPath]
   )

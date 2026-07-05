@@ -14,8 +14,6 @@ import ProductCard from "../components/products/ProductCard";
 import { useProductPolling } from "../hooks/useProductPolling";
 import FilterSidebar from "../components/products/FilterSidebar";
 
-import DealCarousel from "../components/products/DealCarousel";
-
 const PAGE_SIZE = 12;
 
 function Products() {
@@ -158,48 +156,6 @@ function Products() {
       .filter(Boolean);
   }, [categories, products]);
 
-  const topRatedDeals = useMemo(() => {
-    return [...products]
-      .sort((a, b) => b.rating - a.rating)
-      .slice(0, 12);
-  }, [products]);
-
-  const bestValueDeals = useMemo(() => {
-    return [...products]
-      .filter((p) => typeof p.discountPercentage === "number")
-      .sort((a, b) => b.discountPercentage - a.discountPercentage)
-      .slice(0, 12);
-  }, [products]);
-
-  const spotlightCategory = useMemo(() => {
-    if (categories.includes("smartphones")) return "smartphones";
-    if (categories.includes("laptops")) return "laptops";
-    return categories[0] || "";
-  }, [categories]);
-
-  const spotlightDeals = useMemo(() => {
-    if (!spotlightCategory) return [];
-    return products
-      .filter((p) => p.category === spotlightCategory)
-      .sort((a, b) => b.rating - a.rating)
-      .slice(0, 12);
-  }, [products, spotlightCategory]);
-
-  const handleSeeAllTopRated = useCallback(() => {
-    updateParams({ sort: "rating-desc", page: "1" });
-    scrollToListing();
-  }, [updateParams, scrollToListing]);
-
-  const handleSeeAllBestValue = useCallback(() => {
-    updateParams({ sort: "price-asc", page: "1" });
-    scrollToListing();
-  }, [updateParams, scrollToListing]);
-
-  const handleSeeAllSpotlight = useCallback(() => {
-    if (!spotlightCategory) return;
-    updateParams({ category: [spotlightCategory], sort: "rating-desc", page: "1" });
-    scrollToListing();
-  }, [spotlightCategory, updateParams, scrollToListing]);
 
   // Filter -> Search -> Sort pipeline (memoized so it only recalculates when inputs change)
   const filteredProducts = useMemo(() => {
@@ -270,21 +226,7 @@ function Products() {
     <div>
       <h1 className="text-2xl font-bold mb-4">Products</h1>
 
-      <DealCarousel
-        title="Best Value Deals"
-        products={bestValueDeals}
-        onSeeAll={handleSeeAllBestValue}
-        onProductClick={handleOpenProduct}
-      />
 
-      {spotlightDeals.length > 0 && (
-        <DealCarousel
-          title={`Best Sellers in ${spotlightCategory.replace(/-/g, " ")}`}
-          products={spotlightDeals}
-          onSeeAll={handleSeeAllSpotlight}
-          onProductClick={handleOpenProduct}
-        />
-      )}
 
       <div ref={listingRef} className="flex flex-col lg:flex-row gap-6 mt-5">
         <FilterSidebar
