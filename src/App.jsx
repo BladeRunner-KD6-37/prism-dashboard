@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 const Products = lazy(() => import('./pages/Products'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const Analytics = lazy(() => import('./pages/Analytics'))
+const Cart = lazy(() => import('./pages/Cart'))
 
 function PageFallback() {
   return (
@@ -55,6 +56,14 @@ function App() {
                 <Analytics />
               </Suspense>
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <Suspense fallback={<PageFallback />}>
+              <Cart />
+            </Suspense>
           }
         />
       </Route>

@@ -40,3 +40,15 @@ npm run build
 
 ## License
 MIT
+
+
+
+# changes to make
+- move product filter to the side
+- put some background image behind the whole page
+- create a home route(landing page), show product cards with explicit design
+- set the theme of the website in a perticular colour(including the buttons and product cards)
+- change the font of the page
+- Particular logo
+- better brand name
+- 
