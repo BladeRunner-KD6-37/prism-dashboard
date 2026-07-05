@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 // Lazy-loaded route components — each becomes its own JS chunk,
 // only downloaded when the user actually visits that route
 const Products = lazy(() => import('./pages/Products'))
+const ProductsHome = lazy(() => import('./pages/ProductsHome'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const Analytics = lazy(() => import('./pages/Analytics'))
 const Cart = lazy(() => import('./pages/Cart'))
@@ -22,7 +23,7 @@ function PageFallback() {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/products" replace />} />
+      <Route path="/" element={<Navigate to="/products/home" replace />} />
       <Route path="/login" element={<Login />} />
 
       <Route
@@ -32,6 +33,14 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route
+          path="/products/home"
+          element={
+            <Suspense fallback={<PageFallback />}>
+              <ProductsHome />
+            </Suspense>
+          }
+        />
         <Route
           path="/products"
           element={

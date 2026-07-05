@@ -5,6 +5,7 @@ function Sidebar({ mobileOpen, onClose }) {
   const { isAdmin } = useAuth()
 
   const navItems = [
+    { to: '/products/home', label: 'Home' },
     { to: '/products', label: 'Products' },
     ...(isAdmin ? [{ to: '/analytics', label: 'Analytics' }] : []),
   ]

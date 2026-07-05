@@ -10,7 +10,7 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const from = location.state?.from?.pathname || '/products';
+  const from = location.state?.from?.pathname || '/products/home';
 
   if (isAuthenticated) {
     return <Navigate to={from} replace />;

@@ -51,4 +51,3 @@ MIT
 - change the font of the page
 - Particular logo
 - better brand name
-- 

@@ -120,7 +120,7 @@ function CategoryIcon({ category, className }) {
   return <CartIcon className={className} aria-hidden="true" />
 }
 
-function FilterSidebar({ categories, selected, onToggle, onClear }) {
+function FilterSidebar({ categories, selected, onToggle, onClear, selectedGenders, onToggleGender }) {
   const [showAll, setShowAll] = useState(false)
   const visibleCategories = showAll ? categories : categories.slice(0, 10)
 
@@ -141,9 +141,8 @@ function FilterSidebar({ categories, selected, onToggle, onClear }) {
       </div>
 
       <div>
-        <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">
-          Category
-        </h3>
+        <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">Category</h3>
+        <h3 className="text-xs font-semibold text-gray-500 uppercase mt-4 mb-2">Gender</h3>
         <div className="flex flex-row flex-wrap gap-2.5 sm:flex-col sm:max-h-96 sm:overflow-y-auto pr-1">
           {visibleCategories.map((cat) => {
             const isChecked = selected.includes(cat)
@@ -167,6 +166,24 @@ function FilterSidebar({ categories, selected, onToggle, onClear }) {
                   }`}
                 >
                   {cat.replace(/-/g, ' ')}
+                </span>
+              </label>
+            )
+          })}
+        </div>
+        <div className="flex flex-col gap-2 mt-2">
+          {['men', 'women'].map((g) => {
+            const isChecked = selectedGenders.includes(g)
+            return (
+              <label key={g} className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={() => onToggleGender(g)}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 shrink-0"
+                />
+                <span className={`capitalize text-sm ${isChecked ? 'text-gray-900 font-medium' : 'text-gray-600'}`} >
+                  {g}
                 </span>
               </label>
             )

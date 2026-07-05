@@ -4,8 +4,8 @@ import ColumnSettings from "../components/products/ColumnSettings";
 import { useColumnConfig } from "../hooks/useColumnConfig";
 import { useAuth } from "../context/AuthContext";
 import { usePublishedProducts } from "../hooks/usePublishedProducts";
-import { useMemo, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useMemo, useCallback, useRef } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useProducts } from "../hooks/useProducts";
 import { useDebounce } from "../hooks/useDebounce";
 import SearchBar from "../components/products/SearchBar";
@@ -14,21 +14,30 @@ import ProductCard from "../components/products/ProductCard";
 import { useProductPolling } from "../hooks/useProductPolling";
 import FilterSidebar from "../components/products/FilterSidebar";
 
+import DealCarousel from "../components/products/DealCarousel";
+
 const PAGE_SIZE = 12;
 
 function Products() {
   const { products, setProducts, loading, error } = useProducts();
   useProductPolling(products, setProducts, 8000);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const { isHidden, toggleHidden } = usePublishedProducts();
+  const listingRef = useRef(null);
   const [viewMode, setViewMode] = useState("grid"); // 'grid' | 'table'
   const { columns, toggleVisibility, reorderColumn, resetColumns } =
     useColumnConfig();
 
   // Read state directly from the URL
-  const search = searchParams.get("search") || "";
   const sort = searchParams.get("sort") || "";
+  const gender = searchParams.get("gender") || "";
+  const selectedGenders = useMemo(() =>
+    gender ? gender.split(",") : [],
+    [searchParams]
+  );
+  const search = searchParams.get("search") || "";
   const page = parseInt(searchParams.get("page") || "1", 10);
   const selectedCategories = useMemo(
     () =>
@@ -83,11 +92,14 @@ function Products() {
     [selectedCategories, updateParams],
   );
 
-  const handleSortChange = useCallback(
-    (value) => {
-      updateParams({ sort: value, page: "1" });
+  const handleGenderToggle = useCallback(
+    (g) => {
+      const next = selectedGenders.includes(g)
+        ? selectedGenders.filter((c) => c !== g)
+        : [...selectedGenders, g];
+      updateParams({ gender: next, page: "1" });
     },
-    [updateParams],
+    [selectedGenders, updateParams]
   );
 
   const handlePageChange = useCallback(
@@ -97,11 +109,97 @@ function Products() {
     [updateParams],
   );
 
+  // Update sort parameter when user selects a sorting option
+  const handleSortChange = useCallback(
+    (value) => {
+      updateParams({ sort: value, page: "1" });
+    },
+    [updateParams],
+  );
+
+  const scrollToListing = useCallback(() => {
+    listingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
+  const handleCategoryTileClick = useCallback(
+    (category) => {
+      handleCategoryToggle(category);
+      scrollToListing();
+    },
+    [handleCategoryToggle, scrollToListing],
+  );
+
+  const handleOpenProduct = useCallback(
+    (productId) => {
+      navigate(`/products/${productId}`);
+    },
+    [navigate],
+  );
+
   // Derive all available categories from the fetched data
   const categories = useMemo(() => {
     const set = new Set(products.map((p) => p.category));
     return Array.from(set).sort();
-  }, [products, selectedCategories, debouncedSearch, sort, isAdmin, isHidden]);
+  }, [products]);
+
+  const categoryTiles = useMemo(() => {
+    return categories
+      .map((category) => {
+        const representative = products.find((p) => p.category === category);
+        if (!representative) return null;
+
+        return {
+          category,
+          label: category.replace(/-/g, " "),
+          thumbnail: representative.thumbnail,
+          count: products.filter((p) => p.category === category).length,
+        };
+      })
+      .filter(Boolean);
+  }, [categories, products]);
+
+  const topRatedDeals = useMemo(() => {
+    return [...products]
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 12);
+  }, [products]);
+
+  const bestValueDeals = useMemo(() => {
+    return [...products]
+      .filter((p) => typeof p.discountPercentage === "number")
+      .sort((a, b) => b.discountPercentage - a.discountPercentage)
+      .slice(0, 12);
+  }, [products]);
+
+  const spotlightCategory = useMemo(() => {
+    if (categories.includes("smartphones")) return "smartphones";
+    if (categories.includes("laptops")) return "laptops";
+    return categories[0] || "";
+  }, [categories]);
+
+  const spotlightDeals = useMemo(() => {
+    if (!spotlightCategory) return [];
+    return products
+      .filter((p) => p.category === spotlightCategory)
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 12);
+  }, [products, spotlightCategory]);
+
+  const handleSeeAllTopRated = useCallback(() => {
+    updateParams({ sort: "rating-desc", page: "1" });
+    scrollToListing();
+  }, [updateParams, scrollToListing]);
+
+  const handleSeeAllBestValue = useCallback(() => {
+    updateParams({ sort: "price-asc", page: "1" });
+    scrollToListing();
+  }, [updateParams, scrollToListing]);
+
+  const handleSeeAllSpotlight = useCallback(() => {
+    if (!spotlightCategory) return;
+    updateParams({ category: [spotlightCategory], sort: "rating-desc", page: "1" });
+    scrollToListing();
+  }, [spotlightCategory, updateParams, scrollToListing]);
 
   // Filter -> Search -> Sort pipeline (memoized so it only recalculates when inputs change)
   const filteredProducts = useMemo(() => {
@@ -115,8 +213,17 @@ function Products() {
       result = result.filter((p) => selectedCategories.includes(p.category));
     }
 
-    if (selectedCategories.length > 0) {
-      result = result.filter((p) => selectedCategories.includes(p.category));
+    if (selectedGenders.length > 0) {
+      result = result.filter((p) => {
+        const cat = p.category.toLowerCase();
+        if (selectedGenders.includes("men")) {
+          if (/mens|men|male/.test(cat)) return true;
+        }
+        if (selectedGenders.includes("women")) {
+          if (/womens|women|female/.test(cat)) return true;
+        }
+        return false;
+      });
     }
 
     if (debouncedSearch.trim()) {
@@ -136,7 +243,7 @@ function Products() {
     }
 
     return result;
-  }, [products, selectedCategories, debouncedSearch, sort]);
+  }, [products, selectedCategories, selectedGenders, debouncedSearch, sort]);
 
   // Pagination slice
   const totalPages = Math.max(
@@ -163,12 +270,30 @@ function Products() {
     <div>
       <h1 className="text-2xl font-bold mb-4">Products</h1>
 
-      <div className="flex flex-col lg:flex-row gap-6">
+      <DealCarousel
+        title="Best Value Deals"
+        products={bestValueDeals}
+        onSeeAll={handleSeeAllBestValue}
+        onProductClick={handleOpenProduct}
+      />
+
+      {spotlightDeals.length > 0 && (
+        <DealCarousel
+          title={`Best Sellers in ${spotlightCategory.replace(/-/g, " ")}`}
+          products={spotlightDeals}
+          onSeeAll={handleSeeAllSpotlight}
+          onProductClick={handleOpenProduct}
+        />
+      )}
+
+      <div ref={listingRef} className="flex flex-col lg:flex-row gap-6 mt-5">
         <FilterSidebar
           categories={categories}
           selected={selectedCategories}
           onToggle={handleCategoryToggle}
           onClear={handleClearCategories}
+          selectedGenders={selectedGenders}
+          onToggleGender={handleGenderToggle}
         />
 
         <div className="flex-1 min-w-0">
