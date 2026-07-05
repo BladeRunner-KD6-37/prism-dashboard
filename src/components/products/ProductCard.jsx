@@ -37,7 +37,7 @@ function ProductCard({ product, isAdmin, isHidden, onToggleHidden }) {
         <img
           src={product.thumbnail}
           alt={product.title}
-          className="w-full h-36 object-cover rounded-md mb-3"
+          className="w-full h-36 object-contain bg-gray-50 rounded-md mb-3 p-1"
           loading="lazy"
         />
         <h3 className="font-medium text-sm text-gray-900 truncate">{product.title}</h3>

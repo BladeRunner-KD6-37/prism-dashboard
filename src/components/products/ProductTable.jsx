@@ -12,7 +12,7 @@ function ProductTable({ products, columns, isAdmin, isHidden, onToggleHidden }) 
           <img
             src={product.thumbnail}
             alt={product.title}
-            className="w-12 h-12 object-cover rounded-md"
+            className="w-12 h-12 object-contain bg-gray-50 rounded-md p-1"
             loading="lazy"
           />
         )
