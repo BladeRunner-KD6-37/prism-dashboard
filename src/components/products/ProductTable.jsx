@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { formatInr } from '../../utils/currency'
 
 function ProductTable({ products, columns, isAdmin, isHidden, onToggleHidden }) {
   const navigate = useNavigate()
@@ -21,7 +22,7 @@ function ProductTable({ products, columns, isAdmin, isHidden, onToggleHidden }) 
       case 'category':
         return <span className="capitalize text-gray-600">{product.category}</span>
       case 'price':
-        return <span className="font-medium">${product.price}</span>
+        return <span className="font-medium">{formatInr(product.price)}</span>
       case 'stock':
         return (
           <span className={product.stock > 0 ? 'text-green-600' : 'text-red-500'}>

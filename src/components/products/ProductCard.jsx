@@ -1,5 +1,6 @@
 import { memo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { formatInr } from '../../utils/currency'
 
 function ProductCard({ product, isAdmin, isHidden, onToggleHidden }) {
   const navigate = useNavigate()
@@ -43,7 +44,7 @@ function ProductCard({ product, isAdmin, isHidden, onToggleHidden }) {
         <h3 className="font-medium text-sm text-gray-900 truncate">{product.title}</h3>
         <p className="text-xs text-gray-500 capitalize mb-2">{product.category}</p>
         <div className="flex items-center justify-between mt-auto">
-          <span className="font-semibold text-gray-900">${product.price}</span>
+          <span className="font-semibold text-gray-900">{formatInr(product.price)}</span>
           <span className="text-xs text-yellow-600 font-medium">★ {product.rating}</span>
         </div>
         <span

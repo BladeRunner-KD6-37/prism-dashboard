@@ -4,6 +4,7 @@ import { fetchProductById } from '../api/products';
 import ImageCarousel from '../components/products/ImageCarousel';
 import { useAuth } from '../context/AuthContext';
 import { usePublishedProducts } from '../hooks/usePublishedProducts';
+import { formatInr } from '../utils/currency';
 
 function ProductDetail() {
   const { id } = useParams()
@@ -92,7 +93,7 @@ function ProductDetail() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.title}</h1>
 
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-2xl font-semibold text-gray-900">${product.price}</span>
+            <span className="text-2xl font-semibold text-gray-900">{formatInr(product.price)}</span>
             <span className="text-sm text-yellow-600 font-medium">★ {product.rating}</span>
             <span
               className={`text-sm font-medium ${

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useProducts } from '../hooks/useProducts'
 import StatCard from '../components/charts/StatCard'
 import CategoryChart from '../components/charts/CategoryChart'
+import { formatInr } from '../utils/currency'
 
 function Analytics() {
   const { products, loading, error } = useProducts()
@@ -54,9 +55,7 @@ function Analytics() {
         />
         <StatCard
           label="Total Inventory Value"
-          value={`$${stats.inventoryValue.toLocaleString(undefined, {
-            maximumFractionDigits: 0,
-          })}`}
+          value={formatInr(stats.inventoryValue)}
           sublabel="price × stock, all products"
         />
       </div>
