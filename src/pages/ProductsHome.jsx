@@ -1,5 +1,8 @@
 import { useMemo, useState } from 'react'
 import SearchBar from '../components/products/SearchBar'
+import { useProducts } from '../hooks/useProducts'
+import DealCarousel from '../components/products/DealCarousel'
+import { useNavigate } from 'react-router-dom'
 import { formatInr } from '../utils/currency'
 
 const featuredProducts = [
@@ -34,18 +37,31 @@ const featuredProducts = [
 
 function ProductsHome() {
   const [search, setSearch] = useState('')
+  const { products } = useProducts()
 
+
+
+  const bestValueDeals = useMemo(() => {
+    return [...products]
+      .filter((p) => typeof p.discountPercentage === 'number')
+      .sort((a, b) => b.discountPercentage - a.discountPercentage)
+      .slice(0, 12);
+  }, [products]);
+
+  const navigate = useNavigate();
+  const handleSeeAllBestValue = () => {
+    navigate('/products?sort=price-asc');
+  };
   const filteredProducts = useMemo(() => {
-    const query = search.trim().toLowerCase()
-    if (!query) return featuredProducts
-
+    const query = search.trim().toLowerCase();
+    if (!query) return featuredProducts;
     return featuredProducts.filter(
       (product) =>
         product.title.toLowerCase().includes(query) ||
         product.category.toLowerCase().includes(query) ||
         product.description.toLowerCase().includes(query)
-    )
-  }, [search])
+    );
+  }, [search]);
 
   return (
     <div>
@@ -63,22 +79,29 @@ function ProductsHome() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredProducts.map((product) => (
-            <article
-              key={product.id}
-              className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-            >
-              <img src={product.image} alt={product.title} className="w-full h-56 object-cover" loading="lazy" />
+              <article
+                key={product.id}
+                className="bg-white mb-5 border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              >
+                <img src={product.image} alt={product.title} className="w-full h-56 object-cover" loading="lazy" />
 
-              <div className="p-5">
-                <p className="text-xs font-medium uppercase tracking-wide text-blue-600">{product.category}</p>
-                <h3 className="mt-1 text-lg font-semibold text-gray-900">{product.title}</h3>
-                <p className="mt-2 text-sm text-gray-600 leading-6">{product.description}</p>
-                <p className="mt-4 text-xl font-bold text-gray-900">{formatInr(product.price)}</p>
-              </div>
-            </article>
+                <div className="p-5">
+                  <p className="text-xs font-medium uppercase tracking-wide text-blue-600">{product.category}</p>
+                  <h3 className="mt-1 text-lg font-semibold text-gray-900">{product.title}</h3>
+                  <p className="mt-2 text-sm text-gray-600 leading-6">{product.description}</p>
+                  <p className="mt-4 text-xl font-bold text-gray-900">{formatInr(product.price)}</p>
+                </div>
+              </article>
             ))}
           </div>
         )}
+
+        <DealCarousel
+          title="Best Value Deals"
+          products={bestValueDeals}
+          onSeeAll={handleSeeAllBestValue}
+          onProductClick={(id) => navigate(`/products/${id}`)}
+          orientation="vertical" />
       </section>
     </div>
   )
