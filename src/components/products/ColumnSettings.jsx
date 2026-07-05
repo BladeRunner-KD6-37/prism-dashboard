@@ -19,7 +19,7 @@ function ColumnSettings({ columns, onToggle, onReorder, onReset }) {
     <div className="relative">
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="px-3 py-2 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 flex items-center gap-1.5"
+        className="px-3 py-2 text-sm  border-[#FFD232]  bg-[#FFFFFF] hover:bg-[#FFD232] flex items-center gap-1.5 rounded-2xl border-1 border-gray-200"
       >
         <span>⚙</span> Columns
       </button>
@@ -30,7 +30,7 @@ function ColumnSettings({ columns, onToggle, onReorder, onReset }) {
           <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 p-3">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-semibold text-gray-500 uppercase">Columns</p>
-              <button onClick={onReset} className="text-xs text-blue-600 hover:underline">
+              <button onClick={onReset} className="text-xs text-black hover:underline">
                 Reset
               </button>
             </div>

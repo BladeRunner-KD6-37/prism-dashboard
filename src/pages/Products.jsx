@@ -242,18 +242,18 @@ function Products() {
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <SearchBar value={search} onChange={handleSearchChange} />
             <SortDropdown value={sort} onChange={handleSortChange} />
-
+FFD232
             <div className="flex items-center gap-2 ml-auto">
-              <div className="flex border border-gray-300 rounded-md overflow-hidden">
+              <div className="flex border border-gray-300 rounded-2xl overflow-hidden">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`px-3 py-2 text-sm ${viewMode === "grid" ? "bg-blue-600 text-white" : "bg-white text-gray-600"}`}
+                  className={`px-3 py-2 text-sm ${viewMode === "grid" ? "bg-[#FFD232] text-white" : "bg-white text-gray-600"}`}
                 >
                   Grid
                 </button>
                 <button
                   onClick={() => setViewMode("table")}
-                  className={`px-3 py-2 text-sm ${viewMode === "table" ? "bg-blue-600 text-white" : "bg-white text-gray-600"}`}
+                  className={`px-3 py-2 text-sm ${viewMode === "table" ? "bg-[#FFD232] text-white" : "bg-white text-gray-600"}`}
                 >
                   Table
                 </button>
