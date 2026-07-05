@@ -242,7 +242,6 @@ function Products() {
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <SearchBar value={search} onChange={handleSearchChange} />
             <SortDropdown value={sort} onChange={handleSortChange} />
-FFD232
             <div className="flex items-center gap-2 ml-auto">
               <div className="flex border border-gray-300 rounded-2xl overflow-hidden">
                 <button
