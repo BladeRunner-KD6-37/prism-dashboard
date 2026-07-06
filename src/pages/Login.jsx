@@ -55,7 +55,7 @@ function Login() {
 
       {/* Glossy & Translucent Login Card */}
       <div className="relative z-20 bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-2xl w-full max-w-sm">
-        <h1 className="text-3xl font-extrabold mb-1 text-center text-white tracking-wide">Prism</h1>
+        <h1 className="text-3xl font-extrabold mb-1 text-center text-white tracking-wide">THE CART</h1>
         <p className="text-sm text-gray-200 text-center mb-6 font-light">Sign in to your dashboard</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -115,4 +115,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Login
