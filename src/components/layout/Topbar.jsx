@@ -39,7 +39,7 @@ function Topbar({ onMenuClick }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M7 13l-1.35 2.7a1 1 0 001.06 1.48h9.58a1 1 0 001.06-1.48L17 13M7 13V6" />
         </svg>
         {cartCount > 0 && (
-          <span className="absolute -top-1 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-xs text-white">
+          <span className="absolute -top-1 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FFD232] text-[#4E5664] px-1 text-xs">
             {cartCount > 99 ? '99+' : cartCount}
           </span>
         )}
@@ -48,7 +48,7 @@ function Topbar({ onMenuClick }) {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setDropdownOpen((prev) => !prev)}
-          className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-medium"
+          className="w-8 h-8 rounded-full bg-[#FFD232] text-[#4E5664] flex items-center justify-center text-sm font-medium"
         >
           {currentUser?.username?.[0]?.toUpperCase() || 'U'}
         </button>

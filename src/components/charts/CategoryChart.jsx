@@ -23,7 +23,7 @@ function CategoryChart({ data }) {
         />
         <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
         <Tooltip />
-        <Bar dataKey="count" fill="#2563eb" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="count" fill="#FFD232" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )

@@ -30,11 +30,11 @@ function Cart() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-gray-900">Your Cart</h1>
+        <h1 className="text-2xl font-semibold text-[#4E5664]">Your Cart</h1>
         {hasItems && (
           <button
             onClick={clearCart}
-            className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100"
+            className="rounded-3xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100"
           >
             Clear Cart
           </button>
