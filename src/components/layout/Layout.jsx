@@ -4,17 +4,22 @@ import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import LocomotiveScroll from 'locomotive-scroll'
 import 'locomotive-scroll/dist/locomotive-scroll.css'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('sidebar-collapsed') === 'true'
   })
-  
+  const [introCompleted, setIntroCompleted] = useState(false)
+
   const containerRef = useRef(null)
   const contentRef = useRef(null)
   const scrollInstanceRef = useRef(null)
   const location = useLocation()
+
+  const isHomePage = location.pathname === '/products/home'
+  const hideSidebarAndTopbar = isHomePage && !introCompleted
 
   const toggleSidebar = () => {
     setIsCollapsed((prev) => {
@@ -44,28 +49,45 @@ function Layout() {
       scroll.destroy()
       scrollInstanceRef.current = null
     }
-  }, [])
+  }, [hideSidebarAndTopbar])
 
-  // Scroll to top immediately on route/page transition
+  // Scroll to top immediately on route/page transition or intro completion
   useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0
+    }
     if (scrollInstanceRef.current) {
       scrollInstanceRef.current.scrollTo(0, { immediate: true })
     }
-  }, [location.pathname])
+  }, [location.pathname, introCompleted])
+
+  // Refresh GSAP ScrollTrigger when layout size changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh()
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [introCompleted])
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar 
-        mobileOpen={mobileOpen} 
-        onClose={() => setMobileOpen(false)} 
-        isCollapsed={isCollapsed}
-        toggleSidebar={toggleSidebar}
-      />
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {!hideSidebarAndTopbar && (
+        <Sidebar
+          mobileOpen={mobileOpen}
+          onClose={() => setMobileOpen(false)}
+          isCollapsed={isCollapsed}
+          toggleSidebar={toggleSidebar}
+        />
+      )}
       <div className="flex flex-1 flex-col min-w-0">
-        <Topbar onMenuClick={() => setMobileOpen(true)} />
-        <main ref={containerRef} className="flex-1 overflow-y-auto p-4 md:p-6">
+        {!hideSidebarAndTopbar && <Topbar onMenuClick={() => setMobileOpen(true)} />}
+        <main
+          ref={containerRef}
+          className={`flex-1 overflow-y-auto transition-all duration-500 ease-in-out ${hideSidebarAndTopbar ? 'p-0' : 'p-4 md:p-6'
+            }`}
+        >
           <div ref={contentRef}>
-            <Outlet />
+            <Outlet context={{ introCompleted, setIntroCompleted }} />
           </div>
         </main>
       </div>
@@ -73,4 +95,4 @@ function Layout() {
   )
 }
 
-export default Layout
+export default Layout
