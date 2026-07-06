@@ -4,8 +4,7 @@ import Login from './pages/Login'
 import Layout from './components/layout/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 
-// Lazy-loaded route components — each becomes its own JS chunk,
-// only downloaded when the user actually visits that route
+
 const Products = lazy(() => import('./pages/Products'))
 const ProductsHome = lazy(() => import('./pages/ProductsHome'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))

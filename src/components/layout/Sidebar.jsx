@@ -57,7 +57,7 @@ function Sidebar({ mobileOpen, onClose, isCollapsed, toggleSidebar, isHidden }) 
       >
         <div className="flex items-center justify-between mb-8 px-2 relative min-h-[40px]">
           <span className={`text-xl font-bold transition-all duration-300 ${isCollapsed ? 'md:opacity-0 md:pointer-events-none md:w-0' : 'opacity-100 w-auto'}`}>
-            Prism
+            THE CART
           </span>
           <button
             onClick={toggleSidebar}
@@ -111,4 +111,4 @@ function Sidebar({ mobileOpen, onClose, isCollapsed, toggleSidebar, isHidden }) 
   )
 }
 
-export default Sidebar
+export default Sidebar
