@@ -188,6 +188,7 @@ function DealCarousel({ title, products, onSeeAll, onProductClick, orientation =
                 <img src={product.thumbnail} alt={product.title} loading="lazy" className="w-full h-full object-cover" />
               </div>
               <h4 className="text-xs font-medium text-gray-900 line-clamp-2 min-h-8">{product.title}</h4>
+              <p className="text-[10px] font-montserrat-desc line-clamp-2 mt-1">{product.description}</p>
               <p className="mt-1 text-xs font-semibold text-gray-900">{formatInr(product.price)}</p>
               <p className="text-[10px] text-yellow-600 font-medium">★ {product.rating}</p>
             </article>

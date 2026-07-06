@@ -42,7 +42,10 @@ function ProductCard({ product, isAdmin, isHidden, onToggleHidden }) {
           loading="lazy"
         />
         <h3 className="font-medium text-sm text-gray-900 truncate">{product.title}</h3>
-        <p className="text-xs text-gray-500 capitalize mb-2">{product.category}</p>
+        <p className="text-xs text-gray-500 capitalize mb-1">{product.category}</p>
+        <p className="text-xs font-montserrat-desc line-clamp-2 mb-2">
+          {product.description}
+        </p>
         <div className="flex items-center justify-between mt-auto">
           <span className="font-semibold text-gray-900">{formatInr(product.price)}</span>
           <span className="text-xs text-yellow-600 font-medium">★ {product.rating}</span>

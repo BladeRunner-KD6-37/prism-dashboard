@@ -89,7 +89,7 @@ function ProductsHome() {
                 <div className="p-5">
                   <p className="text-xs font-medium uppercase tracking-wide text-blue-600">{product.category}</p>
                   <h3 className="mt-1 text-lg font-semibold text-gray-900">{product.title}</h3>
-                  <p className="mt-2 text-sm text-gray-600 leading-6">{product.description}</p>
+                  <p className="mt-2 text-sm font-montserrat-desc leading-6">{product.description}</p>
                   <p className="mt-4 text-xl font-bold text-gray-900">{formatInr(product.price)}</p>
                 </div>
               </article>

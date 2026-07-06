@@ -53,7 +53,7 @@ function Cart() {
           <p className="mb-4 text-sm text-gray-500">Add a few products to continue.</p>
           <Link
             to="/products"
-            className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="inline-flex items-center rounded-2xl bg-[#FFD232] px-4 py-2 text-sm font-medium text-[#4E5664]"
           >
             Browse Products
           </Link>
@@ -129,7 +129,7 @@ function Cart() {
 
             <button
               onClick={handleCheckout}
-              className="mt-5 w-full rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+              className="mt-5 w-full rounded-3xl bg-[#FFD232] px-4 py-2.5 text-sm font-medium text-[#4E5664]"
             >
               Checkout
             </button>
