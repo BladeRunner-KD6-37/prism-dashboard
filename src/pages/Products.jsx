@@ -10,6 +10,7 @@ import { useProducts } from "../hooks/useProducts";
 import { useDebounce } from "../hooks/useDebounce";
 import SearchBar from "../components/products/SearchBar";
 import SortDropdown from "../components/products/SortDropdown";
+
 import ProductCard from "../components/products/ProductCard";
 import { useProductPolling } from "../hooks/useProductPolling";
 import FilterSidebar from "../components/products/FilterSidebar";
