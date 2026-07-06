@@ -19,7 +19,7 @@ function Layout() {
   const location = useLocation()
 
   const isHomePage = location.pathname === '/products/home'
-  const hideSidebarAndTopbar = isHomePage && !introCompleted
+  const sidebarHidden = isHomePage && !introCompleted
 
   const toggleSidebar = () => {
     setIsCollapsed((prev) => {
@@ -49,9 +49,9 @@ function Layout() {
       scroll.destroy()
       scrollInstanceRef.current = null
     }
-  }, [hideSidebarAndTopbar])
+  }, [])
 
-  // Scroll to top immediately on route/page transition or intro completion
+  // Scroll to top immediately on route/page transition
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = 0
@@ -59,7 +59,7 @@ function Layout() {
     if (scrollInstanceRef.current) {
       scrollInstanceRef.current.scrollTo(0, { immediate: true })
     }
-  }, [location.pathname, introCompleted])
+  }, [location.pathname])
 
   // Refresh GSAP ScrollTrigger when layout size changes
   useEffect(() => {
@@ -71,19 +71,23 @@ function Layout() {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {!hideSidebarAndTopbar && (
-        <Sidebar
-          mobileOpen={mobileOpen}
-          onClose={() => setMobileOpen(false)}
-          isCollapsed={isCollapsed}
-          toggleSidebar={toggleSidebar}
-        />
-      )}
+      <Sidebar
+        mobileOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+        isHidden={sidebarHidden}
+      />
       <div className="flex flex-1 flex-col min-w-0">
-        {!hideSidebarAndTopbar && <Topbar onMenuClick={() => setMobileOpen(true)} />}
+        <div
+          className={`transition-all duration-500 ease-in-out ${sidebarHidden ? 'h-0 opacity-0 pointer-events-none overflow-hidden' : 'h-14 opacity-100'
+            }`}
+        >
+          <Topbar onMenuClick={() => setMobileOpen(true)} />
+        </div>
         <main
           ref={containerRef}
-          className={`flex-1 overflow-y-auto transition-all duration-500 ease-in-out ${hideSidebarAndTopbar ? 'p-0' : 'p-4 md:p-6'
+          className={`flex-1 overflow-y-auto transition-all duration-500 ease-in-out ${sidebarHidden ? 'p-0' : 'p-4 md:p-6'
             }`}
         >
           <div ref={contentRef}>

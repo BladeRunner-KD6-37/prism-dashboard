@@ -2,7 +2,7 @@ import './Sidebar.css';
 import { NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
-function Sidebar({ mobileOpen, onClose, isCollapsed, toggleSidebar }) {
+function Sidebar({ mobileOpen, onClose, isCollapsed, toggleSidebar, isHidden }) {
   const { isAdmin } = useAuth()
   const location = useLocation()
 
@@ -49,7 +49,8 @@ function Sidebar({ mobileOpen, onClose, isCollapsed, toggleSidebar }) {
         className={`
           fixed md:static top-0 left-0 h-full shrink-0
           bg-white border-r border-gray-200 py-4 z-50
-          transition-all duration-300 ease-in-out
+          transition-all duration-500 ease-in-out
+          ${isHidden ? '!w-0 !px-0 !opacity-0 !pointer-events-none !border-r-0 !overflow-hidden' : ''}
           ${mobileOpen ? 'translate-x-0 w-64 px-4' : '-translate-x-full w-64 md:translate-x-0'}
           ${isCollapsed ? 'md:w-16 md:px-2' : 'md:w-56 md:px-4'}
         `}
